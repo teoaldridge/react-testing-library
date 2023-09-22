@@ -1,70 +1,142 @@
-# Getting Started with Create React App
+This repo was created following this tutorial,
+which was reccomended by the original React Testing Library docs:
+https://www.robinwieruch.de/react-testing-library/
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## To run the tests:
 
-## Available Scripts
+type 'npm run test'
 
-In the project directory, you can run:
+# Notes
 
-### `npm start`
+### SEARCH TYPES
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+These are all the different search types available in RTL:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+getBy search types:
 
-### `npm test`
+- getByText
+- getByRole
+- getByLabelText
+- getByPlaceholderText
+- getByAltText
+- getByDisplayValue
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+queryBy search types:
 
-### `npm run build`
+- queryByText
+- queryByRole
+- queryByLabelText
+- queryByPlaceholderText
+- queryByAltText
+- queryByDisplayValue
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+findBy search types:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- findByText
+- findByRole
+- findByLabelText
+- findByPlaceholderText
+- findByAltText
+- findByDisplayValue
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Of them, getByText and getByRole should generally be your go-to
+search types to select elements from your rendered React components with React Testing Library.
 
-### `npm run eject`
+## SCREEN.DEBUG()
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Adding the screen.debug() function in your test will console.log the html structure of your component.
+The debug() method can be used to view the virtually rendered DOM.
+! You should place screen.debug() just below your render(). For example:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```JavaScript
+render(<AddUser />);
+screen.debug();
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## SCREEN.GETALLBYROLE()
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Adding the screen.getAllByRole('') or just getByRole('') funcion in your test will console.log all selectable roles if you provide a role that isn't available in the rendered component's HTML (like leave it an empty string:'').
 
-## Learn More
+### SEARCH VARIANTS
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The search variants in RTL are:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- getBy
+- queryBy
+- findBy
 
-### Code Splitting
+### When to use queryBy:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### getBy VS queryBy:
 
-### Analyzing the Bundle Size
+We prefer to use queryBy in order to assert elements which aren't there.
+(If you try to use getBy, it would not be able to even find the element- so it won't even get to the assertion).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### When to use findBy:
 
-### Making a Progressive Web App
+The findBy search variant is used for asynchronous elements which will be there eventually.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## MULTIPLE ELEMENTS
 
-### Advanced Configuration
+All search variants can be extended with the All word:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- getAllBy
+- queryAllBy
+- findAllBy
 
-### Deployment
+## ASSERTIVE FUNCTIONS
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Usually all these assertive functions origin from Jest/Vitest (and therefore Chai). However, React Testing Library extends this API with its own assertive functions like toBeInTheDocument. All these assertive functions come in an extra package which are already set up for you when using create-react-app.
 
-### `npm run build` fails to minify
+- toBeDisabled
+- toBeEnabled
+- toBeEmpty
+- toBeEmptyDOMElement
+- toBeInTheDocument
+- toBeInvalid
+- toBeRequired
+- toBeValid
+- toBeVisible
+- toContainElement
+- toContainHTML
+- toHaveAttribute
+- toHaveClass
+- toHaveFocus
+- toHaveFormValues
+- toHaveStyle
+- toHaveTextContent
+- toHaveValue
+- toHaveDisplayValue
+- toBeChecked
+- toBePartiallyChecked
+- toHaveDescription
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## FIRE EVENT: SIMULATING USER INTERACTIONS
+
+We can use RTL's fireEvent and waitFor functions to simulate interactions of an end user.
+
+In tests with fireEvent, you need to address the asynchronous behaviour: You need to wait for the event to be fired, and then do an assertion.
+You can use "async await" or "waitFor" in your tests in which you fire events (see examples in App.test.js)
+
+## USER EVENT
+
+The userEvent API mimics the actual browser behavior more closely than the fireEvent API. For example, a fireEvent.change() triggers only a change event whereas userEvent.type triggers a change event, but also keyDown, keyPress, and keyUp events.
+
+## CALLBACK HANDLERS
+
+example:
+
+- Jest
+  const onChange = jest.fn();
+- Vitest
+  const onChange = vi.fn();
+
+See Search.test.js
+
+## ASYNCHRONOUS / ASYNC
+
+Look at my other repo: react-testing-library-async for an example of testing async. It is a small example for testing data fetching in React. It tests a React component which uses axios for fetching data from a remote API.
+
+```
+
+```
